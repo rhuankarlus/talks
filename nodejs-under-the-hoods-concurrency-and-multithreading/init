@@ -1,24 +1,27 @@
 #!/bin/bash
 
 # limpando containeres e volumes
+echo "Parando e removendo containeres previamente iniciados..."
 docker stop node-under-the-hood-pg
 docker rm node-under-the-hood-pg
-docker volume rm node-under-the-hood-pg-volume
 
 # limpando diretorios de runtime
+echo "Removendo diretorios de runtime..."
 rm -rf /$(pwd)/pg/data
 rm -rf /$(pwd)/build
 rm -rf /$(pwd)/node_modules
 
 # recriando diretorio de dados do postgres
+echo "Criando diretório PostgreSQL..."
 mkdir /$(pwd)/pg/data
 
 # compilando addons e recriando node_modules
+echo "Construindo ADDONs e carregando modulos..."
 node-gyp configure build
 yarn
 
 # iniciando postgres
-#docker volume create node-under-the-hood-pg-volume
+echo "Iniciando PostgreSQL..."
 docker run \
     --name node-under-the-hood-pg \
     -v /$(pwd)/pg/data:/var/lib/postgresql/data \
@@ -26,3 +29,16 @@ docker run \
     -p 5432:5432 \
     -e POSTGRES_PASSWORD=postgres \
     -d postgres
+
+# aguardando finalizacao dos scripts do postgres
+postgresOn=$(docker exec -it node-under-the-hood-pg psql -h localhost -U postgres -d postgres -c "SELECT 1" | grep '1 row')
+while [[ "$postgresOn" != *"1 row"* ]]
+do
+    echo "Esperando PostgreSQL..."
+    sleep 10
+    postgresOn=$(docker exec -it node-under-the-hood-pg psql -h localhost -U postgres -d postgres -c "SELECT 1" | grep '1 row')
+done
+
+# iniciando aplicacao
+echo "Iniciando servidor"
+yarn start
