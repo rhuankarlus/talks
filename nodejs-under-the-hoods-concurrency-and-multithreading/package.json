@@ -1,0 +1,11 @@
+{
+  "name": "nodejs-under-the-hoods-concurrency-and-multithreading",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "lodash": "^4.17.15",
+    "pg": "^7.18.1"
+  }
+}

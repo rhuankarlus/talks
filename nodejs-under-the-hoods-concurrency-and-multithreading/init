@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# limpando dados e finalizando caso estivesse iniciado
+docker stop node-under-the-hood-pg
+docker rm node-under-the-hood-pg
+rm -rf /$(pwd)/pg/data
+mkdir /$(pwd)/pg/data
+
+# iniciando postgres
+#docker volume create node-under-the-hood-pg-volume
+docker run \
+    --name node-under-the-hood-pg \
+    -v /$(pwd)/pg/data:/var/lib/postgresql/data \
+    -v /$(pwd)/pg/scripts:/docker-entrypoint-initdb.d \
+    -p 5432:5432 \
+    -e POSTGRES_PASSWORD=postgres \
+    -d postgres
