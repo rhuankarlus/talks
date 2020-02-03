@@ -1,10 +1,21 @@
 #!/bin/bash
 
-# limpando dados e finalizando caso estivesse iniciado
+# limpando containeres e volumes
 docker stop node-under-the-hood-pg
 docker rm node-under-the-hood-pg
+docker volume rm node-under-the-hood-pg-volume
+
+# limpando diretorios de runtime
 rm -rf /$(pwd)/pg/data
+rm -rf /$(pwd)/build
+rm -rf /$(pwd)/node_modules
+
+# recriando diretorio de dados do postgres
 mkdir /$(pwd)/pg/data
+
+# compilando addons e recriando node_modules
+node-gyp configure build
+yarn
 
 # iniciando postgres
 #docker volume create node-under-the-hood-pg-volume

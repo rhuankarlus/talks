@@ -7,7 +7,7 @@ console.log(`worker-${threadId}: starting...`);
 let counter = 0;
 const interval = setInterval(() => {
     console.log(`worker-${threadId}: counting now... I'm on -> ${counter}`);
-    if (++counter == 10) {
+    if (++counter == 14) {
         clearInterval(interval);
         parentPort.postMessage({
             counter,
