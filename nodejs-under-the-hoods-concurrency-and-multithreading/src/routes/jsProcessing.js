@@ -35,4 +35,18 @@ router.get('/js_async', async (req, res) => {
     });
 });
 
+router.get('/js_timeout', (req, res) => {
+    const init = Date.now();
+    setTimeout(() => {
+        const sum = jsSum();
+        res.jsonp({
+            sum,
+            timeInSeconds: (Date.now() - init)/1000,
+            proccesses: {
+                pid: processId,
+            }
+        });
+    }, 1000);
+});
+
 module.exports = router;

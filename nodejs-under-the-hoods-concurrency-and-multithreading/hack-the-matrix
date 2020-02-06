@@ -1,0 +1,15 @@
+# watch -n 0.1 curl http://localhost:3000/ &
+# watch -n 0.1 curl http://localhost:3000/users &
+# watch -n 0.1 curl http://localhost:3000/readFile &
+# watch -n 0.1 curl http://localhost:3000/sendRequest
+# #watch -n 0.01 curl http://localhost:3000/cpp_async
+
+while true
+do
+    sleep 1
+    curl http://localhost:3000/ & 
+    curl http://localhost:3000/users &
+    curl http://localhost:3000/readFile &
+    curl http://localhost:3000/sendRequest &
+    curl http://localhost:3000/cpp_async &
+done

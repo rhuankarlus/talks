@@ -24,7 +24,6 @@ router.get('/cpp_async', (req, res) => {
         console.log(`terminei: ${timeInSeconds}`);
         res.jsonp({
             sum: result,
-            timeInSeconds,
             proccesses: {
                 pid: processId,
             }
