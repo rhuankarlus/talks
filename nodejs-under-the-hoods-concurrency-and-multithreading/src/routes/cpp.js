@@ -32,7 +32,7 @@ router.get('/cpp_async', (req, res) => {
     });
 });
 
-router.get('/cpp_async_promise', async (req, res) => {
+router.get('/cpp_promise', async (req, res) => {
     const init = Date.now();
     const sum = await new Promise(resolve => {
         sumAsync.sum((result) => {

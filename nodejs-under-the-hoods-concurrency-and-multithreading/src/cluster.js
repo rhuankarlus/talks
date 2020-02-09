@@ -21,8 +21,6 @@ if (cluster.isMaster) {
         console.log(`worker ${worker.process.pid} died`);
     });
 } else {
-    process.env.UV_THREADPOOL_SIZE = 14;
-
     app
         .use((req, res, next) => {
             req.initTime = new Date();

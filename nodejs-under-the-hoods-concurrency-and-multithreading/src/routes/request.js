@@ -2,7 +2,7 @@ const router = require('express').Router();
 const https = require('https');
 const processId = process.pid;
 
-router.get('/sendRequest', (req, res) => {
+router.get('/send_request', (req, res) => {
     https.get(
         'https://jsonplaceholder.typicode.com/todos/',
         httpRes => {

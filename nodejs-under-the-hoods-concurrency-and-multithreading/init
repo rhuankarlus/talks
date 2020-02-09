@@ -49,7 +49,9 @@ done
 nohup /$(pwd)/populate_db &
 echo $! > nohup.pid
 
+# essa trap eh utilizada para matar o processo de populate_db caso o processo principal seja finalizado ou cancelado
+trap 'kill -9 `cat nohup.pid`' 0
+
 # iniciando aplicacao
 echo "Iniciando servidor"
-trap 'kill -9 `cat nohup.pid`' 0
 yarn start

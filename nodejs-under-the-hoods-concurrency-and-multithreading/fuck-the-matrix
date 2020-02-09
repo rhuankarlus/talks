@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+while true
+do
+    curl -s http://localhost:3000/js_sync > /dev/null &
+    curl -s http://localhost:3000/js_async > /dev/null &
+    curl -s http://localhost:3000/cpp_sync > /dev/null &
+    curl -s http://localhost:3000/js_timeout > /dev/null &
+    sleep 5
+done
