@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+# populando banco de dados
+docker exec node-under-the-hood-pg \
+    psql -h localhost -U postgres -d postgres \
+    -L /logs/pg.log \
+    -f /scripts/data.sql \
+    > /dev/null 2>&1
