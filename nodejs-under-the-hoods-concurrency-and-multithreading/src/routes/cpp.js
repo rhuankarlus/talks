@@ -10,7 +10,7 @@ router.get('/cpp_sync', (req, res) => {
     const sum = sumSync.sum();
     res.jsonp({
         sum,
-        timeInSeconds: (Date.now() - init)/1000,
+        timeInSeconds: (Date.now() - init) / 1000,
         proccesses: {
             pid: processId,
         }
@@ -19,15 +19,33 @@ router.get('/cpp_sync', (req, res) => {
 
 router.get('/cpp_async', (req, res) => {
     const init = Date.now();
-    sumAsync.sum(result => {
-        const timeInSeconds = (Date.now() - init)/1000;
+    sumAsync.sum((sum) => {
+        const timeInSeconds = (Date.now() - init) / 1000;
         console.log(`terminei: ${timeInSeconds}`);
         res.jsonp({
-            sum: result,
+            sum,
+            timeInSeconds,
             proccesses: {
                 pid: processId,
             }
         });
+    });
+});
+
+router.get('/cpp_async_promise', async (req, res) => {
+    const init = Date.now();
+    const sum = await new Promise(resolve => {
+        sumAsync.sum((result) => {
+            setImmediate(() => resolve(result));
+        });
+    });
+    const timeInSeconds = (Date.now() - init) / 1000;
+    console.log(`terminei: ${timeInSeconds}`);
+    res.jsonp({
+        sum,
+        proccesses: {
+            pid: processId,
+        }
     });
 });
 

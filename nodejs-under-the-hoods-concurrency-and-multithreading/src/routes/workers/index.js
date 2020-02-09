@@ -1,12 +1,13 @@
 const router = require('express').Router();
-const {
-    Worker,
-    isMainThread,
-    parentPort,
-    workerData
-} = require('worker_threads');
+const { Worker } = require('worker_threads');
 
 const processId = process.pid;
+
+const EVENTS = {
+    MESSAGE: 'message',
+    ERROR: 'error',
+    EXIT: 'exit',
+};
 
 router.get('/workers', (req, res) => {
     const init = Date.now();
@@ -40,28 +41,63 @@ router.get('/workers', (req, res) => {
         }
     };
 
-    heavyWorker.on('message', ({ sum, threadId }) => {
+    heavyWorker.on(EVENTS.MESSAGE, ({ sum, threadId }) => {
         console.log(`[MAIN PROCESS]: message reveived from ${threadId}`);
         heavyWorkerData.sum = sum;
         heavyWorkerData.threadId = threadId;
     });
-    heavyWorker.on('error', (err) => console.log('[heavy worker] ERROR:', err));
-    heavyWorker.on('exit', (code) => {
+    heavyWorker.on(EVENTS.ERROR, (err) => console.log('[heavy worker] ERROR:', err));
+    heavyWorker.on(EVENTS.EXIT, (code) => {
         console.log(`[heavy worker] finished with code -> ${code}`);
         heavyWorkerData.finished = true;
         sendResponse();
     });
 
-    talkativeWorker.on('message', ({ counter, threadId }) => {
+    talkativeWorker.on(EVENTS.MESSAGE, ({ counter, threadId }) => {
         console.log(`[MAIN PROCESS]: message reveived from ${threadId}`);
         talkativeWorkerData.counter = counter;
         talkativeWorkerData.threadId = threadId;
     });
-    talkativeWorker.on('error', (err) => console.log('[talkative worker] ERROR:', err));
-    talkativeWorker.on('exit', (code) => {
+    talkativeWorker.on(EVENTS.ERROR, (err) => console.log('[talkative worker] ERROR:', err));
+    talkativeWorker.on(EVENTS.EXIT, (code) => {
         console.log(`[talkative worker] finished with code -> ${code}`);
         talkativeWorkerData.finished = true;
         sendResponse();
+    });
+});
+
+router.get('/workers_teamplate_string', (req, res) => {
+    const init = Date.now();
+    const tsWorker = new Worker(`
+        const {
+            parentPort,
+            threadId,
+        } = require('worker_threads');
+
+        console.log(\`Starting at ${new Date()}\`);
+        let talk = 1;
+        const interval = setInterval(() => {
+            console.log(\`counting....\${talk}\`);
+            if (++talk === 6) {
+                clearInterval(interval);
+                parentPort.postMessage({ threadId });
+            }
+        }, 1000);
+    `, { eval: true });
+
+    tsWorker.on(EVENTS.MESSAGE, ({ threadId }) => {
+        console.log(`[MAIN PROCESS]: message reveived from ${threadId}`);
+        res.jsonp({
+            timeInSeconds: (Date.now() - init)/1000,
+            proccesses: {
+                pid: processId,
+                threadId,
+            },
+        });
+    });
+    tsWorker.on(EVENTS.ERROR, (err) => console.log('[template string worker] ERROR:', err));
+    tsWorker.on(EVENTS.EXIT, (code) => {
+        console.log(`[template string worker] finished with code -> ${code}`);
     });
 });
 
