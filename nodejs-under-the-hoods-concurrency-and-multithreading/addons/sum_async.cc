@@ -13,9 +13,11 @@ struct ThreadData {
     double result;
 };
 
+// função de processamento de dados
 static void WorkAsync(uv_work_t *req) {
     ThreadData* threadData = static_cast<ThreadData*>(req->data);
 
+    // realiza o processamento dos dados
     int i, j;
     double a = 3.1415926, b = 2.718;
     for (i = 0; i < 1000000000; i++) {
@@ -24,21 +26,24 @@ static void WorkAsync(uv_work_t *req) {
         }
     }
 
+    // insere o resultado na memória compartilhada
     threadData->result = a;
 }
 
-// called by libuv in event loop when async function completes
+// função que será chamada pela LibUV quando a thread
+// processadora finalizar seu trabalho
 static void WorkAsyncComplete(uv_work_t *req, int status) {
     Isolate* isolate = Isolate::GetCurrent();
-    v8::HandleScope handleScope(isolate); // Required for Node 4.x
+    v8::HandleScope handleScope(isolate); // Node 4.x
     
     ThreadData *threadData = static_cast<ThreadData *>(req->data);
 
-    // set up return arguments
+    // pegando o resultado
     double result = threadData->result;
     Local<Value> argv[] = { Number::New(isolate, result) };
 
-    // execute the callback
+    // executando o callback passado
+    // como parâmetro para o Addon
     Local<Function>::New(
         isolate,
         threadData->callback
@@ -49,9 +54,11 @@ static void WorkAsyncComplete(uv_work_t *req, int status) {
         argv // argv
     ).ToLocalChecked();
 
-    // Free up the persistent function callback
+    // libera os dados de callback do struct
     threadData->callback.Reset();
 
+    // por fim, remove o struct do espaço de
+    // memória compartilhado pelo threadpool
     delete threadData;
 }
 
@@ -61,12 +68,12 @@ void SumAsync(const v8::FunctionCallbackInfo<v8::Value>& args) {
     ThreadData* threadData = new ThreadData();
     threadData->request.data = threadData;
 
-    // store the callback from JS in the threadData package so we can 
-    // invoke it later
+    // guarda o callback JS no pacote threadData para 
+    // que possamos chamá-lo mais tarde
     Local<Function> callback = Local<Function>::Cast(args[0]);
     threadData->callback.Reset(isolate, callback);
 
-    // kick of the worker thread
+    // incializa uma thread do pool
     uv_queue_work(
         uv_default_loop(),
         &threadData->request,
@@ -74,6 +81,8 @@ void SumAsync(const v8::FunctionCallbackInfo<v8::Value>& args) {
         WorkAsyncComplete
     );
 
+    // retorna um valor sem erros para o Event Loop
+    // enquanto o processamento assíncrono acontece
     args.GetReturnValue().Set(Undefined(isolate));
 }
 
