@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+getRealPath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+SCRIPT_DIR=$(getRealPath $0)
+BASEDIR=$(dirname "${SCRIPT_DIR}")
+echo "aqui ${BASEDIR}"
+
+# limpando containeres e volumes
+echo "Parando e removendo containeres previamente iniciados..."
+docker stop node-under-the-hood-pg || true
+docker rm node-under-the-hood-pg || true
+
+# limpando diretorios de runtime
+echo "Removendo diretorios de runtime..."
+rm -rf ${BASEDIR}/pg/data
+rm -rf ${BASEDIR}/pg/logs
+rm -rf ${BASEDIR}/build
+rm -rf ${BASEDIR}/node_modules
+rm -rf ${BASEDIR}/nohup.out
+rm -rf ${BASEDIR}/nohup.pid

@@ -1,24 +1,20 @@
 #!/bin/bash
 set -e
 
-# limpando containeres e volumes
-echo "Parando e removendo containeres previamente iniciados..."
-docker stop node-under-the-hood-pg || true
-docker rm node-under-the-hood-pg || true
+getRealPath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
 
-# limpando diretorios de runtime
-echo "Removendo diretorios de runtime..."
-rm -rf /$(pwd)/pg/data
-rm -rf /$(pwd)/pg/logs
-rm -rf /$(pwd)/build
-rm -rf /$(pwd)/node_modules
-rm -rf /$(pwd)/nohup.out
-rm -rf /$(pwd)/nohup.pid
+SCRIPT_DIR=$(getRealPath $0)
+BASEDIR=$(dirname "${SCRIPT_DIR}")
+
+pushd ${BASEDIR}
+sh ${BASEDIR}/clean
 
 # recriando diretorio de dados do postgres
 echo "Criando diretórios PostgreSQL..."
-mkdir /$(pwd)/pg/data
-mkdir /$(pwd)/pg/logs
+mkdir ${BASEDIR}/pg/data
+mkdir ${BASEDIR}/pg/logs
 
 # compilando addons e recriando node_modules
 echo "Construindo ADDONs e carregando modulos..."
@@ -29,9 +25,9 @@ yarn
 echo "Iniciando PostgreSQL..."
 docker run \
     --name node-under-the-hood-pg \
-    -v /$(pwd)/pg/data:/var/lib/postgresql/data \
-    -v /$(pwd)/pg/scripts:/scripts \
-    -v /$(pwd)/pg/logs:/logs \
+    -v ${BASEDIR}/pg/data:/var/lib/postgresql/data \
+    -v ${BASEDIR}/pg/scripts:/scripts \
+    -v ${BASEDIR}/pg/logs:/logs \
     -p 5432:5432 \
     -e POSTGRES_PASSWORD=postgres \
     -d postgres
@@ -46,11 +42,11 @@ do
 done
 
 # populando banco de dados
-nohup /$(pwd)/populate_db &
-echo $! > nohup.pid
+nohup ${BASEDIR}/populate_db &
+echo $! > ${BASEDIR}/nohup.pid
 
 # essa trap eh utilizada para matar o processo de populate_db caso o processo principal seja finalizado ou cancelado
-trap 'kill -9 `cat nohup.pid`' 0
+trap 'kill -9 `cat nohup.pid` && popd' 0
 
 # iniciando aplicacao
 echo "Iniciando servidor"
