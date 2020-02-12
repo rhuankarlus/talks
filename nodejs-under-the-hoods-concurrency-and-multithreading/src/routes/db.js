@@ -17,7 +17,6 @@ router.get('/users', (req, response) => {
                 res.rows.filter(user => user.age >= 18),
                 'department',
             );
-            console.log('rows', res.rows.length);
             for(let i; i < 10000000; i++) {}
             Object
                 .keys(departamentos)

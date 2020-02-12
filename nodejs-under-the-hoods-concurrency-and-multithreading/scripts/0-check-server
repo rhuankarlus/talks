@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+echo
+echo
+while true
+do
+    curl http://localhost:3000/
+    echo
+    sleep 1
+done

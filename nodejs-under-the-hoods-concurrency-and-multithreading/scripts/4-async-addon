@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+echo "Enviando 100 requisições de 10 em 10 para um endpoint que faz um processamento de dados em C++ assincronamente"
+ab -c 10 -n 100 -r http://localhost:3000/cpp_async
+
+echo
+echo
+echo "Enviando uma requisição a cada 5 segundo para o mesmo endpoint"
+while true
+do
+    curl -s http://localhost:3000/cpp_async > /dev/null &
+    sleep 1
+done

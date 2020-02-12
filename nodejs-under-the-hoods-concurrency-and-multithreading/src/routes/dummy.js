@@ -5,6 +5,7 @@ router.get('/', (req, res) => {
     res.jsonp({
         processId,
         message: 'still alive',
+        time: new Date().toLocaleTimeString(),
     });
 });
 
