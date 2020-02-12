@@ -4,7 +4,7 @@ const processId = process.pid;
 
 router.get('/send_request', (req, res) => {
     https.get(
-        'https://jsonplaceholder.typicode.com/todos/',
+        'https://media.giphy.com/media/tTkTJwKgHQ5uo/giphy.gif',
         httpRes => {
             let chunk = '';
             httpRes.on('data', anotherChunk => {

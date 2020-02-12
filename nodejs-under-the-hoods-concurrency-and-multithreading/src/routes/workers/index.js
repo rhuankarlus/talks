@@ -26,6 +26,7 @@ router.get('/workers', (req, res) => {
 
     const sendResponse = () => {
         if (heavyWorkerData.finished && talkativeWorkerData.finished) {
+            console.log('finished', (Date.now() - init)/1000);
             res.jsonp({
                 sum: heavyWorkerData.sum,
                 counter: talkativeWorkerData.counter,
@@ -42,25 +43,21 @@ router.get('/workers', (req, res) => {
     };
 
     heavyWorker.on(EVENTS.MESSAGE, ({ sum, threadId }) => {
-        console.log(`[MAIN PROCESS]: message reveived from ${threadId}`);
         heavyWorkerData.sum = sum;
         heavyWorkerData.threadId = threadId;
     });
     heavyWorker.on(EVENTS.ERROR, (err) => console.log('[heavy worker] ERROR:', err));
     heavyWorker.on(EVENTS.EXIT, (code) => {
-        console.log(`[heavy worker] finished with code -> ${code}`);
         heavyWorkerData.finished = true;
         sendResponse();
     });
 
     talkativeWorker.on(EVENTS.MESSAGE, ({ counter, threadId }) => {
-        console.log(`[MAIN PROCESS]: message reveived from ${threadId}`);
         talkativeWorkerData.counter = counter;
         talkativeWorkerData.threadId = threadId;
     });
     talkativeWorker.on(EVENTS.ERROR, (err) => console.log('[talkative worker] ERROR:', err));
     talkativeWorker.on(EVENTS.EXIT, (code) => {
-        console.log(`[talkative worker] finished with code -> ${code}`);
         talkativeWorkerData.finished = true;
         sendResponse();
     });
