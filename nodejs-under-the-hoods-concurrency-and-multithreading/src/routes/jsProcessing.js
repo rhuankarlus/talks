@@ -41,12 +41,20 @@ router.get('/js_timeout', (req, res) => {
         const sum = jsSum();
         res.jsonp({
             sum,
+        });
+    }, 1000);
+});
+
+router.get('/wait_200', (req, res) => {
+    const init = Date.now();
+    setTimeout(() => {
+        res.jsonp({
             timeInSeconds: (Date.now() - init)/1000,
             proccesses: {
                 pid: processId,
             }
         });
-    }, 1000);
+    }, 200);
 });
 
 module.exports = router;
