@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+echo "Enviando 100 requisições de 10 em 10 para um endpoint que faz um processamento de dados em JAVASCRIPT utilizando worker threads"
+ab -c 10 -n 100 -r http://localhost:3000/workers
+
+echo
+echo
+echo "Enviando uma requisição a cada 1 segundo para o mesmo endpoint"
+while true
+do
+    curl -s http://localhost:3000/workers > /dev/null &
+    sleep 1
+done

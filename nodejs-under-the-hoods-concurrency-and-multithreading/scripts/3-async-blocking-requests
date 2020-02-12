@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+echo "Enviando 6 requisições de 1 em 1 para um endpoint que faz um processamento de dados em JAVASCRIPT"
+ab -c 2 -n 6 -r http://localhost:3000/js_async
+
+echo
+echo
+echo "Enviando uma requisição a cada 5 segundo para o mesmo endpoint"
+while true
+do
+    curl -s http://localhost:3000/js_async > /dev/null &
+    sleep 5
+done

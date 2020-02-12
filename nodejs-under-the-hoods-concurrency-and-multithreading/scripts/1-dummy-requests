@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+echo "Enviando 1000 requisições de 100 em 100 para um endpoint simples"
+ab -c 100 -n 1000 -r http://localhost:3000/
+
+echo
+echo
+echo "Enviando uma requisição a cada 1 segundo para o mesmo endpoint simples"
+while true
+do
+    curl -s http://localhost:3000/ > /dev/null &
+    sleep 1
+done

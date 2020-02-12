@@ -35,16 +35,6 @@ router.get('/js_async', async (req, res) => {
     });
 });
 
-router.get('/js_timeout', (req, res) => {
-    const init = Date.now();
-    setTimeout(() => {
-        const sum = jsSum();
-        res.jsonp({
-            sum,
-        });
-    }, 1000);
-});
-
 router.get('/wait_200', (req, res) => {
     const init = Date.now();
     setTimeout(() => {
