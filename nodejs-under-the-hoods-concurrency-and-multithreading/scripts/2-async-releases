@@ -7,7 +7,6 @@ do
     curl -s http://localhost:3000/read_file > /dev/null &
     curl -s http://localhost:3000/send_request > /dev/null &
     curl -s http://localhost:3000/cpp_async > /dev/null &
-    curl -s http://localhost:3000/cpp_promise > /dev/null &
     curl -s http://localhost:3000/workers > /dev/null &
     curl -s http://localhost:3000/workers_teamplate_string > /dev/null &
     sleep 5

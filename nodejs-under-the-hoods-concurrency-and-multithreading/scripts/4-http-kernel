@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+echo "Enviando 10 requisições simultaneamente para um endpoint que realiza queries no banco de dados"
+ab -c 10 -n 10 -r http://localhost:3000/send_request

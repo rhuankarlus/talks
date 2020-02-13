@@ -41,18 +41,4 @@ router.get('/users', (req, response) => {
     })
 });
 
-router.get('/users_not_map', (req, response) => {
-    const init = Date.now();
-    req.pool.connect().then(pg_client => {
-        pg_client.query('SELECT * FROM users', (err, res) => {
-            pg_client.release();
-            response.jsonp({
-                processId,
-                rows: res.rowCount,
-                timeInSeconds: (Date.now() - init) / 1000,
-            });
-        });
-    })
-});
-
 module.exports = router;
